@@ -17,3 +17,14 @@ help:
 run-local:
 	@echo "🚀 Running application locally"
 	@go run app/services/rss/main.go
+
+
+# ==================================================================================== #
+# DATABASE
+# ==================================================================================== #
+
+## migrate-local: migrate local database
+migrate-local:
+	@echo "🚀 Migrating local database..."
+	@DATABASE_URL=postgres://postgres:postgres@localhost:5432/feeds?sslmode=disable \
+		dbmate migrate
