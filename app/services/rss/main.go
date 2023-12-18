@@ -5,26 +5,12 @@ import (
 	"os"
 
 	"github.com/antmordel/techtheon/foundation/logger"
+	"github.com/antmordel/techtheon/pkg/rss"
 	"github.com/mmcdole/gofeed"
 	"go.uber.org/zap"
 )
 
-type Feed struct {
-	Name   string
-	Author string
-	Link   string
-}
-
-type Article struct {
-	Title   string
-	Link    string
-	PubDate string
-	Content string
-	Author  string
-	Blog    string
-}
-
-var feeds = []Feed{
+var feeds = []rss.Feed{
 	{
 		Name:   "Irrational Exuberance",
 		Author: "Will Larson",
@@ -83,9 +69,9 @@ func readFeed(log *zap.SugaredLogger, fp *gofeed.Parser, feed Feed) error {
 	return nil
 }
 
-func parseArticle(item *gofeed.Item, feed Feed) (*Article, error) {
+func parseArticle(item *gofeed.Item, feed rss.Feed) (*rss.Article, error) {
 
-	article := Article{
+	article := rss.Article{
 		Title:   item.Title,
 		Link:    item.Link,
 		PubDate: item.Published,
