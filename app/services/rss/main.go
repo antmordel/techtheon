@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
 
 	"github.com/antmordel/techtheon/foundation/logger"
 	"github.com/antmordel/techtheon/pkg/rss"
 	"github.com/mmcdole/gofeed"
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 )
 
@@ -37,20 +41,28 @@ func main() {
 
 func run(log *zap.SugaredLogger) error {
 
-	log.Infow("startup", "status", "started")
+	// =========================================================================
+	// GOMAXPROCS
 
-	// Parse RSS
-	fp := gofeed.NewParser()
-	for _, feed := range feeds {
-		if err := readFeed(log, fp, feed); err != nil {
-			return err
-		}
+	// Set the correct number of threads for the service
+	// based on what is available either by the machine or quotas.
+	if _, err := maxprocs.Set(); err != nil {
+		return fmt.Errorf("maxprocs: %w", err)
 	}
+	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
+
+	// =========================================================================
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-shutdown
+	log.Infow("shutdown", "status", "shutdown started", "signal", sig)
+	defer log.Infow("shutdown", "status", "shutdown complete", "signal", sig)
 
 	return nil
 }
 
-func readFeed(log *zap.SugaredLogger, fp *gofeed.Parser, feed Feed) error {
+func readFeed(log *zap.SugaredLogger, fp *gofeed.Parser, feed rss.Feed) error {
 
 	log.Infow("parsing feed", "feed", feed.Name)
 

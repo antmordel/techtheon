@@ -15,7 +15,7 @@ help:
 ## run-local: run the application locally
 .PHONY: run-local
 run-local:
-	@echo "🚀 Running application locally"
+	@echo "🚀 Running application locally (remember to run docker-compose)"
 	@go run app/services/rss/main.go
 
 

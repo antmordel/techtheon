@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 
 	"github.com/antmordel/techtheon/pkg/data/db"
+	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 )
 
